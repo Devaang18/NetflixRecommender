@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QComboBox, QListWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QComboBox, QListWidget, QLineEdit, QCompleter
 import sys
 
 class RecommenderApp(QWidget):
@@ -15,10 +15,19 @@ class RecommenderApp(QWidget):
         self.label = QLabel('Select a Movie/Show:')
         layout.addWidget(self.label)
 
+
+        self.input = QLineEdit()
+        completer = QCompleter(self.recommender.data_loader.titles)
+        self.input.setCompleter(completer)
+        self.input.textChanged.connect(self.show_recommendations)
+        layout.addWidget(self.input)
+
+        '''
         self.combo_box = QComboBox()
         self.combo_box.addItems(sorted(self.recommender.data_loader.titles))
         self.combo_box.currentIndexChanged.connect(self.show_recommendations)
         layout.addWidget(self.combo_box)
+        '''
 
         self.recommendations_label = QLabel('Recommendations:')
         layout.addWidget(self.recommendations_label)
@@ -28,7 +37,7 @@ class RecommenderApp(QWidget):
         self.setLayout(layout)
 
     def show_recommendations(self):
-        selected_title = self.combo_box.currentText()
+        selected_title = self.input.text()
         recommendations = self.recommender.get_recommendations(selected_title)
         self.recommendations_list.clear()
         self.recommendations_list.addItems(recommendations)

@@ -3,52 +3,31 @@
 # The data is then vectorized using TF-IDF Vectorizer. 
 # The data is then reduced using PCA. 
 # The optimal number of components is found using the cumulative explained variance. 
-# The optimal number of clusters is found using the elbow method. 
+# The optimal number of clusters is found using the elbow method. (Dynamically from kneed library)
 # The data is then clustered using KMeans and Agglomerative Clustering. 
 # The number of movies and TV shows in each cluster is then plotted using a countplot.
 
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import PCA
+
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from kneed import KneeLocator
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
-from data_transfomations import cleaning_data, preprocess_data
+from data_transfomations import cleaning_data
 
-path = "/Users/devaang/Documents/Netflix_movies_and_tv_shows_clustering.csv"
+def trial():
+  path = "/Users/devaang/Documents/Netflix_movies_and_tv_shows_clustering.csv"
 
-df_raw = pd.read_csv(path, index_col = 'show_id')
+  df_raw = pd.read_csv(path, index_col = 'show_id')
+  df = df_raw.copy()
 
-tfidf_vectoriser = TfidfVectorizer(stop_words='english', lowercase=False,max_features = 2000)
-pca = PCA(random_state=42)
+  df = cleaning_data(df)
 
-df = df_raw.copy()
+  return df
 
-df.fillna('', inplace=True)
 
-df = cleaning_data(df)
-
-feat_for_clusters = ['director', 'cast', 'country', 'listed_in', 'description', 'rating']
-
-df['clustered_features']= df[feat_for_clusters].apply(lambda row: ' '.join(row.astype(str)), axis=1)
-
-df['preprocessed_clustered_features'] = df['clustered_features'].apply(preprocess_data)
-
-clustered_features = df['preprocessed_clustered_features']
-
-tfidf_matrix = tfidf_vectoriser.fit_transform(clustered_features)
-
-pca.fit(tfidf_matrix.toarray())
-
-cum_explained_variance = np.cumsum(pca.explained_variance_ratio_)
-desired_variance = 0.90
-optimal_n_components = np.argmax(cum_explained_variance >= desired_variance) + 1
-
-pca = PCA(n_components=optimal_n_components, random_state=42)
-
-reduced_tfidf_matrix = pca.fit_transform(tfidf_matrix.toarray())
+'''clustered_features = df['preprocessed_clustered_features']
+reduced_tfidf_matrix = tfidf(clustered_features)  
 
 inertia = []
 for k in range(1, 20):
@@ -79,7 +58,7 @@ q = sns.countplot(x='Hierarchial Clusters',data=df, hue='type')
 plt.title('Number of movies and TV shows in each cluster - Hier Clustering')
 for i in q.patches:
   q.annotate(format(i.get_height(), '.0f'), (i.get_x() + i.get_width() / 2., i.get_height()), ha = 'center', va = 'center', xytext = (0, 10), textcoords = 'offset points')
-plt.show()
+plt.show()'''
 
 
 
